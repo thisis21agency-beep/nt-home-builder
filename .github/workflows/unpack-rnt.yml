@@ -1,0 +1,50 @@
+name: Unpack RNT source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "bootstrap_parts/**"
+      - ".github/workflows/unpack-rnt.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat bootstrap_parts/part*.b64 | tr -d '\n\r' | base64 --decode > /tmp/rnt-source.zip
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          root = Path(".").resolve()
+          with zipfile.ZipFile("/tmp/rnt-source.zip") as z:
+              bad = z.testzip()
+              if bad:
+                  raise SystemExit(f"Corrupt archive entry: {bad}")
+              z.extractall(root)
+          print("RNT source extracted")
+          PY
+          rm -rf bootstrap_parts bootstrap.py
+          git status --short
+
+      - name: Commit restored Django source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Restore full RNT Django source"
+          git push origin main
