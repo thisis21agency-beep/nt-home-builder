@@ -20,6 +20,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify archive parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          wc -c bootstrap_parts/part*.b64
+          sha256sum bootstrap_parts/part*.b64
+
       - name: Restore source tree
         shell: bash
         run: |
