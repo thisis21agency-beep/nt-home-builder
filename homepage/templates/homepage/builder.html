@@ -1,0 +1,53 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RNT Home Builder</title>
+<link rel="stylesheet" href="{% static 'homepage/builder.css' %}">
+</head>
+<body>
+<header class="topbar">
+  <div><strong>RNT Home Builder</strong><span>{{ page.name }}</span></div>
+  <div class="top-actions"><button id="saveDraft" class="secondary">Save Draft</button><button id="publish" class="primary">Publish</button><a href="/admin/" class="secondary linkbtn">Django Admin</a></div>
+</header>
+<div id="toast" role="status" aria-live="polite"></div>
+<main class="workspace">
+  <aside class="sidebar card">
+    <div class="panel-head"><div><strong>Homepage Sections</strong><small>Move, hide, duplicate or edit any block.</small></div><button id="addSection" class="secondary">+ Add</button></div>
+    <div id="sectionList"></div>
+  </aside>
+
+  <section class="editor card">
+    <div class="panel-head"><div><strong>Edit Section</strong><small id="selectedLabel">Select a section</small></div></div>
+    <form id="sectionForm">
+      <div class="grid2">
+        <label>Name<input id="name"></label><label>Key<input id="key"></label>
+        <label>Type<select id="sectionType">{% for value,label in section_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></label>
+        <label>Layout<select id="layout">{% for value,label in layouts %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></label>
+      </div>
+      <div class="checks"><label><input id="enabled" type="checkbox"> Visible</label><label><input id="hideDesktop" type="checkbox"> Hide desktop</label><label><input id="hideMobile" type="checkbox"> Hide mobile</label></div>
+      <label>Eyebrow<input id="eyebrow"></label><label>Heading<input id="heading"></label><label>Supporting copy<textarea id="subheading"></textarea></label><label>Body HTML<textarea id="bodyHtml"></textarea></label>
+      <div class="grid2"><label>CTA 1 text<input id="cta1Label"></label><label>CTA 1 URL<input id="cta1Url"></label><label>CTA 2 text<input id="cta2Label"></label><label>CTA 2 URL<input id="cta2Url"></label></div>
+      <h3>Media</h3>
+      <div class="grid2"><label>Desktop image URL<input id="desktopImageUrl" placeholder="https://..."></label><label>Mobile image URL<input id="mobileImageUrl" placeholder="https://..."></label></div>
+      <div class="grid2"><label>Upload desktop image<input id="desktopUpload" type="file" accept="image/*"></label><label>Upload mobile image<input id="mobileUpload" type="file" accept="image/*"></label></div>
+      <label>Video URL<input id="videoUrl"></label>
+      <h3>Commerce source</h3>
+      <div class="grid2"><label>Source<select id="sourceType">{% for value,label in sources %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></label><label>Category key<input id="categoryKey" placeholder="girls-dresses"></label><label>Product refs / SKUs<input id="productRefs" placeholder="SKU1, SKU2, SKU3"></label><label>Product limit<input id="productLimit" type="number" min="1" max="40"></label></div>
+      <h3>Scheduling & styling</h3>
+      <div class="grid2"><label>Starts at<input id="startsAt" type="datetime-local"></label><label>Ends at<input id="endsAt" type="datetime-local"></label><label>Background<input id="backgroundColor" placeholder="#ffffff"></label><label>Text colour<input id="textColor" placeholder="#111111"></label><label>Desktop padding<input id="desktopPadding" placeholder="80px 0"></label><label>Mobile padding<input id="mobilePadding" placeholder="40px 0"></label></div>
+      <h3>Cards / Slides / Items</h3><div id="itemsEditor"></div><button id="addItem" type="button" class="secondary">+ Add item</button>
+      <div class="form-actions"><button class="primary" type="submit">Apply Changes</button><button id="duplicate" type="button" class="secondary">Duplicate</button><button id="delete" type="button" class="danger">Delete</button></div>
+    </form>
+  </section>
+
+  <section class="preview card">
+    <div class="panel-head"><div><strong>Live Preview</strong><small id="revisionLabel">Draft · published revision {{ page.published_revision }}</small></div><div><button id="desktopMode" class="secondary active" type="button">Desktop</button><button id="mobileMode" class="secondary" type="button">Mobile</button></div></div>
+    <div class="preview-stage"><div id="storefront" class="storefront desktop"><div class="announce">NEW SEASON · MAKING KIDS HAPPY</div><nav class="store-nav"><strong>RUFF ’N’ TUMBLE</strong><span>NEW IN · GIRLS · BOYS · BABY · SCHOOL</span><span>BAG 0</span></nav><div id="liveSections"></div><footer>RUFF ’N’ TUMBLE · Making Kids Happy</footer></div></div>
+  </section>
+</main>
+{{ draft_data|json_script:"draft-data" }}
+<script>window.RNT_BUILDER={code:"{{ page.code }}",csrf:"{{ csrf_token }}"};</script>
+<script src="{% static 'homepage/builder.js' %}"></script>
+</body></html>

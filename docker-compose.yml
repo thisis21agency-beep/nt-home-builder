@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: rnt_home_builder
+      POSTGRES_USER: rnt
+      POSTGRES_PASSWORD: change-me
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SECRET_KEY: change-me
+      DJANGO_DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: localhost,cms.ruffntumblekids.com
+      RNT_STOREFRONT_ORIGIN: https://www.ruffntumblekids.com
+      DB_NAME: rnt_home_builder
+      DB_USER: rnt
+      DB_PASSWORD: change-me
+      DB_HOST: db
+      DB_PORT: "5432"
+    depends_on:
+      - db
+volumes:
+  postgres_data:
